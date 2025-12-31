@@ -106,10 +106,26 @@ export async function processTurnAction(
     - If characters speak, separate their dialogue from the descriptive text.
     - Assign an emotional tone to the dialogue.
 
-    *** [INTEGRATED ENTITY ENFORCEMENT] ***
-    - **Treat References as Entities:** Every unique location, character, or key object is an 'ENTITY'.
-    - **Consistency Rule:** Once an entity is described (e.g., "The old neon sign buzzing with a red hue"), you MUST maintain that description in future references. Do not change it (e.g., to "blue light") unless the state visibly changes.
-    - **Reuse Descriptions:** If the player re-examines an item, reuse the core visual traits defined previously.
+    *** [INTEGRATED ENTITY ENFORCEMENT & CONSISTENCY RULES] ***
+    
+    1. **VISUAL-VOICE SYNCHRONIZATION (ABSOLUTE):**
+       - If you visually describe a character as "Male" or "Man", their 'character_info.gender' MUST be "Male" (남성).
+       - If you describe "Elegant silk robes", the 'voice_style' should match (e.g., "Smooth", "Arrogant").
+       - **Mismatch = SYSTEM FAILURE.** (e.g., Visual: Old Man / Voice: Young Female -> ❌ FATAL ERROR)
+
+    2. **KOREAN SITUATION OVERLAY (situation_summary):**
+       - You MUST generate a dedicated 'situation_summary' in KOREAN.
+       - This text appears in the "Red Tactical Box" on the UI.
+       - **Content:** Briefly summarize the CURRENT situation/location in 1-2 lines of text.
+       - **Language:** STRICTLY KOREAN. Do NOT use English here.
+       - ❌ (Bad): "First-person perspective of..." (English is for image_prompt ONLY)
+       - ✅ (Good): "붉은 수정이 빛나는 광장에서, 보라색 로브를 입은 광신도들이 당신을 주시하고 있습니다."
+
+    3. **CONTEXT-AWARE AUDIO (SFX/BGM):**
+       - 'audio_cue' must match the IMMEDIATE scene, not the abstract theme.
+       - Focus on: Weather (rain, wind), Surface (gravel, metal floor), Crowd (whispers, cheers), Action (gunshot, footsteps).
+       - Ignore the "Concept" (e.g., Demon King) if the current scene is just a "Quiet Hallway".
+       - Example: Scene is a quiet sewer -> SFX: "Dripping water, distant rats", NOT "Epic Orchestral Battle Music".
 
     *** [IMAGE GENERATION RULES: STRICT FIRST-PERSON POV] ***
     **CRITICAL:** When describing the scene for image generation (or narrative), you must adhere to the "Camera as Eyes" rule.
@@ -266,7 +282,7 @@ export async function processTurnAction(
     The 'narrative_segments' text must be CLEAN spoken words for the player.
 
     1. **REMOVE PARENTHESES/STAGE DIRECTIONS:**
-       - **STRICTLY BAN** `(헉)`, `(sigh)`, `(다급하게)`, `(속마음)` in the text field.
+       - **STRICTLY BAN** \`(헉)\`, \`(sigh)\`, \`(다급하게)\`, \`(속마음)\` in the text field.
        - The text must ONLY contain what is actually SPOKEN.
        - ❌ (Bad): "(헉) 아, 안 돼..."
        - ✅ (Good): "아, 안 돼."

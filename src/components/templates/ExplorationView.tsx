@@ -131,6 +131,46 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
 
                 // ★ Reset Voice Usage for New Dimension
                 resetVoiceUsage(currentWorld.name, currentWorld.theme);
+
+                // ★ IMMEDIATE INITIAL IMAGE GENERATION (V6.1 Fix)
+                // If no persisted image, generate one from world description immediately to fill the Red Box.
+                if (!activeSceneImage) {
+                    setIsLoadingImage(true);
+                    (async () => {
+                        try {
+                            const { generateImageAction } = await import('@/actions/image');
+                            const initialPrompt = `(First Person Point of View) ${currentWorld.description} ${currentWorld.starting_scene || ''}`;
+                            const image = await generateImageAction(
+                                initialPrompt,
+                                currentWorld.theme || "Sci-Fi",
+                                currentWorld.art_style_constraints,
+                                currentWorld.starting_scene || currentWorld.description
+                            );
+                            if (image) {
+                                setSceneImage(image);
+
+                                // ★ Set Initial Overlay Text (Korean)
+                                // Use world description or starting scene as the initial Korean context
+                                const initialContext = {
+                                    location_name: currentWorld.name,
+                                    situation_summary: (currentWorld.starting_scene || currentWorld.description).substring(0, 100) + "...", // Truncate for overlay
+                                    image_prompt: initialPrompt
+                                };
+                                setCurrentSceneContext(initialContext);
+
+                                // Save to persist immediately
+                                useSessionStore.getState().setActiveUI({
+                                    activeSceneImage: image,
+                                    activeSceneContext: initialContext
+                                });
+                            }
+                        } catch (e) {
+                            console.error("Initial image failed", e);
+                        } finally {
+                            setIsLoadingImage(false);
+                        }
+                    })();
+                }
             }
         }
     }, [currentWorld]);
