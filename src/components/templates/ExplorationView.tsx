@@ -430,16 +430,14 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
             } else if (result.scene_context?.location_name) {
                 // Priority 2: Fallback to location name
                 setCurrentSceneContext(`현재 위치: ${result.scene_context.location_name}`);
-                // Priority 3: Last resort (English prompt)
-                setCurrentSceneContext(result.scene_context.image_prompt || null);
             }
+            // Priority 3: REMOVED (Do not fall back to English image_prompt)
 
             // ★ SYNC TO STORE (Persistence)
             // Need to get the freshly set context. Since setState is async, we use the value directly.
             let nextContext = null;
             if (result.scene_context?.situation_summary) nextContext = result.scene_context.situation_summary;
             else if (result.scene_context?.location_name) nextContext = `현재 위치: ${result.scene_context.location_name}`;
-            else if (result.scene_context?.image_prompt) nextContext = result.scene_context.image_prompt;
 
             if (nextContext) {
                 useSessionStore.getState().setActiveUI(result.choices, sceneImage, nextContext);
