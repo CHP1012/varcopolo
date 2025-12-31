@@ -1020,7 +1020,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                                 Connected to Dimension: {currentWorld.name}
                             </span>
                         </div>
-                        <p className="text-stone-300 text-sm leading-relaxed line-clamp-2">
+                        <p className="text-stone-300 text-sm leading-relaxed max-h-[4.5rem] overflow-y-auto scrollbar-hide">
                             {typeof currentSceneContext === 'object' && currentSceneContext !== null
                                 ? (currentSceneContext.situation_summary || currentSceneContext.location_name || currentWorld.description)
                                 : (currentSceneContext || currentWorld.description)}
