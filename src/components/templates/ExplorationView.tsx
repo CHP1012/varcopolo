@@ -1090,7 +1090,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                                     </div>
                                 ) : (
                                     <>
-                                        <ChoiceView choices={choices} onSelect={handleChoice} disabled={isProcessing} />
+                                        <ChoiceView choices={choices || []} onSelect={handleChoice} disabled={isProcessing} />
                                         <div className="mt-4">
                                             <CommandInput onSubmit={handleCommand} disabled={isProcessing} />
                                         </div>
