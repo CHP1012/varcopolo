@@ -926,20 +926,31 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                 </div>
                 <div className="flex items-center gap-4">
                     {/* Story Finish Button - V6.1 AI Activated */}
-                    {/* Story Finish Button - V6.1 AI Activated */}
-                    {canFinishVoyage && (
-                        <motion.button
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            whileHover={{ scale: 1.05 }}
-                            onClick={() => handleCommand("나는 이 이야기를 여기서 마무리하기로 했다.")}
-                            className="bg-blue-900/30 text-blue-400 hover:text-blue-200 hover:bg-blue-800/50 border border-blue-500/50 flex items-center gap-1.5 px-3 py-1.5 rounded transition-all animate-pulse-slow ml-auto"
-                            title="항해 종료 (Finish Voyage)"
-                        >
-                            <BookOpen size={16} />
-                            <span className="text-xs font-bold font-retro tracking-wider whitespace-nowrap">항해 종료</span>
-                        </motion.button>
-                    )}
+                    {/* Story Finish Button - Always Visible (Disabled if unsafe) */}
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: canFinishVoyage ? 1 : 0.4, scale: 1 }}
+                        whileHover={canFinishVoyage ? { scale: 1.05 } : {}}
+                        onClick={() => {
+                            if (canFinishVoyage) handleCommand("나는 이 이야기를 여기서 마무리하기로 했다.");
+                            else {
+                                // Optional: access addLog from store to show warning? Or just simple alert/shake
+                                // For now, just a visual disabled state is enough.
+                            }
+                        }}
+                        className={clsx(
+                            "flex items-center gap-1.5 px-3 py-1.5 rounded transition-all ml-auto border",
+                            canFinishVoyage
+                                ? "bg-blue-900/30 text-blue-400 hover:text-blue-200 hover:bg-blue-800/50 border-blue-500/50 animate-pulse-slow cursor-pointer"
+                                : "bg-ui-bg/50 text-secondary/30 border-secondary/20 cursor-not-allowed"
+                        )}
+                        title={canFinishVoyage ? "항해 종료 (Finish Voyage)" : "⚠️ 위협 수준이 높아 항해를 종료할 수 없습니다."}
+                    >
+                        <BookOpen size={16} />
+                        <span className="text-xs font-bold font-retro tracking-wider whitespace-nowrap">
+                            {canFinishVoyage ? "항해 종료" : "종료 불가"}
+                        </span>
+                    </motion.button>
 
                     {/* Audio Controls */}
                     <div className="flex items-center gap-2 mr-2">
