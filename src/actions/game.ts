@@ -305,7 +305,7 @@ export async function processTurnAction(
     To prevent "image flickering" and maintain visual consistency:
     - You must output \`scene_context\` to control image generation.
     - \`image_prompt\`: Detailed visual description in ENGLISH (for Image Gen AI).
-    - `situation_summary` (Korean): A VERY concise, one-sentence summary of the current situation for the HUD overlay (Max 50 characters). ex: "거대 기업의 음모가 도사리는 네오 서울의 뒷골목." in KOREAN (for UI display).
+    - \`situation_summary\` (Korean): A VERY concise, one-sentence summary of the current situation for the HUD overlay (Max 50 characters). ex: "거대 기업의 음모가 도사리는 네오 서울의 뒷골목." in KOREAN (for UI display).
     - If the player is in the SAME location and SAME general visual situation, set \`action: "MAINTAIN"\`.
     - If the player MOVES to a new place or a MAJOR visual change occurs (e.g., explosion, lights out), set \`action: "NEW"\`.
     - \`location_id\` should remain CONSTANT for the same place (e.g. "alley_01", "office_main").
