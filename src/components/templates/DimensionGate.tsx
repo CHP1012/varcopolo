@@ -1405,7 +1405,6 @@ export default function DimensionGate({ onEnter }: DimensionGateProps) {
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: bootStep >= 3 ? 1 : 0, y: bootStep >= 3 ? 0 : 30 }}
                             transition={{ duration: 0.5 }}
-                            transition={{ duration: 0.5 }}
                             className="w-full max-w-4xl flex flex-col items-center gap-4 z-20 pb-8 shrink-0"
                         >
                             <div className="text-center space-y-2">
