@@ -903,8 +903,8 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
             </AnimatePresence>
 
             {/* Header: World Info */}
-            <header className="p-3 border-b border-ui-border flex justify-between items-center bg-ui-bg/80 backdrop-blur z-20 sticky top-0">
-                <div className="flex items-center gap-4">
+            <header className="px-3 py-2 border-b border-ui-border flex justify-between items-center bg-ui-bg/80 backdrop-blur z-20 sticky top-0 gap-2 overflow-hidden">
+                <div className="flex items-center gap-2 md:gap-4 min-w-0 shrink">
                     {currentWorld.canReturn ? (
                         <button
                             onClick={onExit}
@@ -919,9 +919,9 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                             <LogOut className="rotate-180 opacity-30" size={20} />
                         </div>
                     )}
-                    <div>
-                        <h2 className="text-lg font-bold text-primary tracking-widest uppercase font-retro">{currentWorld.name}</h2>
-                        <p className="text-xs text-secondary/80 font-mono">{currentWorld.timeOfDay} | Threat: {currentWorld.threatLevel}</p>
+                    <div className="min-w-0">
+                        <h2 className="text-base md:text-lg font-bold text-primary tracking-widest uppercase font-retro truncate">{currentWorld.name}</h2>
+                        <p className="text-[10px] md:text-xs text-secondary/80 font-mono truncate">{currentWorld.timeOfDay} | Threat: {currentWorld.threatLevel}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -939,7 +939,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                             }
                         }}
                         className={clsx(
-                            "flex items-center gap-1.5 px-3 py-1.5 rounded transition-all ml-auto border",
+                            "flex items-center gap-1 px-2 py-1 md:px-3 md:py-1.5 rounded transition-all ml-auto border md:ml-0 shrink-0",
                             canFinishVoyage
                                 ? "bg-blue-900/30 text-blue-400 hover:text-blue-200 hover:bg-blue-800/50 border-blue-500/50 animate-pulse-slow cursor-pointer"
                                 : "bg-ui-bg/50 text-secondary/30 border-secondary/20 cursor-not-allowed"
@@ -965,12 +965,12 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                             title={settings.sfxEnabled ? "SFX ON" : "SFX OFF"}
                         >
                             {settings.sfxEnabled ? <Volume2 size={12} /> : <VolumeX size={12} />}
-                            <span>SFX</span>
+                            <span className="hidden md:inline">SFX</span>
                         </button>
                         <button
                             onClick={() => useSessionStore.getState().updateSettings({ bgmEnabled: !settings.bgmEnabled })}
                             className={clsx(
-                                "flex items-center gap-1.5 px-2 py-1 rounded transition-colors text-xs font-mono border",
+                                "flex items-center gap-1 px-1.5 py-1 rounded transition-colors text-xs font-mono border shrink-0",
                                 settings.bgmEnabled
                                     ? "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20"
                                     : "bg-transparent text-secondary/50 border-transparent hover:text-secondary hover:border-secondary/30"
@@ -978,12 +978,12 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                             title={settings.bgmEnabled ? "BGM ON" : "BGM OFF"}
                         >
                             {settings.bgmEnabled ? <Activity size={12} /> : <VolumeX size={12} />}
-                            <span>BGM</span>
+                            <span className="hidden md:inline">BGM</span>
                         </button>
                     </div>
 
-                    <div className={`w-2 h-2 rounded-full ${isLoadingImage ? 'bg-yellow-500 animate-ping' : 'bg-green-500'}`} />
-                    <span className="text-xs font-mono text-info/70">
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${isLoadingImage ? 'bg-yellow-500 animate-ping' : 'bg-green-500'}`} />
+                    <span className="text-xs font-mono text-info/70 hidden md:inline whitespace-nowrap">
                         {headerText}
                     </span>
                 </div>
