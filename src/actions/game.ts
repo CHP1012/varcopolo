@@ -101,7 +101,8 @@ export async function processTurnAction(
     - Create a noir/imaginative narrative (KOREAN).
     - If a known entity appears (from Step 1), **YOU MUST USE THEIR EXACT \`character_id\` and \`voice_style\`** from the known list.
     - Do NOT create a new \`character_id\` for an existing NPC. Check [WORLD KNOWLEDGE] first.
-    - For new characters, generate a stable \`character_id\` (e.g. "shop_owner", "police_chief").
+    - **[NAME REVEAL RULE]**: If an NPC reveals their name (e.g. "Unknown" -> "Jack"), update the `speaker` field but **KEEP the original `character_id`** (e.g. "vent_survivor"). This preserves their voice.
+    - For new characters (like "Drone"), generate a new, distinct `character_id`.
     - If Appearance matched, integrate the recognition into the narrative.
     - Advance the story.
     
