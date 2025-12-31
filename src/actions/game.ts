@@ -98,8 +98,11 @@ export async function processTurnAction(
     - IF MATCH: The world/NPCs should react to that reputation (Hostile/Friendly/Fearful).
     
     Step 2: Narrative Generation
-    - Describe the consequences of the action.
-    - IF Appearance matched, integrate the recognition into the narrative.
+    - Create a noir/imaginative narrative (KOREAN).
+    - If a known entity appears (from Step 1), **YOU MUST USE THEIR EXACT \`character_id\` and \`voice_style\`** from the known list.
+    - Do NOT create a new \`character_id\` for an existing NPC. Check [WORLD KNOWLEDGE] first.
+    - For new characters, generate a stable \`character_id\` (e.g. "shop_owner", "police_chief").
+    - If Appearance matched, integrate the recognition into the narrative.
     - Advance the story.
     
     Step 3: Dialogue Structuring (Voice Acting Prep)
