@@ -557,7 +557,7 @@ export default function DimensionGate({ onEnter }: DimensionGateProps) {
 
     return (
         <div
-            className="flex flex-col items-center justify-between w-full h-full p-8 bg-background text-foreground relative font-mono overflow-hidden cursor-crosshair"
+            className="flex flex-col items-center w-full h-[100dvh] bg-background text-foreground relative font-mono overflow-y-auto overflow-x-hidden cursor-crosshair"
             onMouseMove={handleMouseMove}
         >
             {/* Background Grid */}
@@ -1065,10 +1065,10 @@ export default function DimensionGate({ onEnter }: DimensionGateProps) {
                         <div className="absolute inset-0 bg-scanlines pointer-events-none opacity-5" />
 
                         {/* Main Orrery GUI */}
-                        <main className="relative flex-1 w-full flex items-center justify-center overflow-hidden p-4">
+                        <main className="relative flex-1 w-full flex flex-col items-center justify-center p-4 min-h-0 shrink-0">
 
-                            {/* THE ORRERY - Fixed size container, NO flex */}
-                            <div className="relative w-full max-w-[600px] aspect-square">
+                            {/* THE ORRERY - Responsive sizing */}
+                            <div className="relative w-[70vw] h-[70vw] max-w-[400px] max-h-[400px] md:max-w-[600px] md:max-h-none md:w-full md:aspect-square shrink-0 my-4 md:my-0">
 
                                 {/* ALL ELEMENTS SHARE THIS COORDINATE SYSTEM */}
 
@@ -1168,8 +1168,8 @@ export default function DimensionGate({ onEnter }: DimensionGateProps) {
                                     return themesToRender.map((theme, i) => {
                                         const angle = (i * 360) / themesToRender.length - 90;
                                         const angleRad = angle * (Math.PI / 180);
-                                        // ★ FIX: Shrink diameter on mobile to avoid overlap with footer/headers
-                                        const radius = typeof window !== 'undefined' && window.innerWidth < 768 ? 36 : 45;
+                                        // ★ FIX: Shrink diameter on mobile
+                                        const radius = typeof window !== 'undefined' && window.innerWidth < 768 ? 40 : 45;
                                         const x = 50 + Math.cos(angleRad) * radius;
                                         const y = 50 + Math.sin(angleRad) * radius;
 
@@ -1405,7 +1405,8 @@ export default function DimensionGate({ onEnter }: DimensionGateProps) {
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: bootStep >= 3 ? 1 : 0, y: bootStep >= 3 ? 0 : 30 }}
                             transition={{ duration: 0.5 }}
-                            className="w-full max-w-4xl flex flex-col items-center gap-4 z-20"
+                            transition={{ duration: 0.5 }}
+                            className="w-full max-w-4xl flex flex-col items-center gap-4 z-20 pb-8 shrink-0"
                         >
                             <div className="text-center space-y-2">
                                 <p className="text-secondary text-xs uppercase tracking-widest">{statusText}</p>
