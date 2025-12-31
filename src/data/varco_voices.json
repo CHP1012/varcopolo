@@ -1,0 +1,105 @@
+[
+    {
+        "uuid": "voice-m-old-1",
+        "name": "Eldrin",
+        "gender": "male",
+        "age": "old",
+        "tags": [
+            "wise",
+            "scratchy",
+            "calm",
+            "wizard"
+        ],
+        "emotions": [
+            "neutral",
+            "angry",
+            "sad",
+            "happy"
+        ]
+    },
+    {
+        "uuid": "voice-m-young-1",
+        "name": "Kai",
+        "gender": "male",
+        "age": "young",
+        "tags": [
+            "heroic",
+            "energetic",
+            "confident"
+        ],
+        "emotions": [
+            "neutral",
+            "angry",
+            "sad",
+            "happy"
+        ]
+    },
+    {
+        "uuid": "voice-f-young-1",
+        "name": "Lia",
+        "gender": "female",
+        "age": "young",
+        "tags": [
+            "soft",
+            "mysterious",
+            "calm"
+        ],
+        "emotions": [
+            "neutral",
+            "angry",
+            "sad",
+            "happy"
+        ]
+    },
+    {
+        "uuid": "voice-f-adult-1",
+        "name": "Vera",
+        "gender": "female",
+        "age": "adult",
+        "tags": [
+            "authoritative",
+            "leader",
+            "strong"
+        ],
+        "emotions": [
+            "neutral",
+            "angry",
+            "sad",
+            "happy"
+        ]
+    },
+    {
+        "uuid": "voice-m-adult-1",
+        "name": "Garrick",
+        "gender": "male",
+        "age": "adult",
+        "tags": [
+            "rough",
+            "soldier",
+            "deep"
+        ],
+        "emotions": [
+            "neutral",
+            "angry",
+            "sad",
+            "happy"
+        ]
+    },
+    {
+        "uuid": "voice-m-villain-1",
+        "name": "Malakar",
+        "gender": "male",
+        "age": "adult",
+        "tags": [
+            "sinister",
+            "cold",
+            "whispery"
+        ],
+        "emotions": [
+            "neutral",
+            "angry",
+            "sad",
+            "happy"
+        ]
+    }
+]
