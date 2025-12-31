@@ -1066,8 +1066,8 @@ export default function DimensionGate({ onEnter }: DimensionGateProps) {
                         {/* Main Orrery GUI */}
                         <main className="relative flex-1 w-full flex flex-col items-center justify-center p-4 min-h-0 shrink-0">
 
-                            {/* THE ORRERY - Responsive sizing */}
-                            <div className="relative w-[70vw] h-[70vw] max-w-[400px] max-h-[400px] md:max-w-[600px] md:max-h-none md:w-full md:h-auto md:aspect-square shrink-0 my-4 md:my-0">
+                            {/* THE ORRERY - Responsive sizing: strictly width-based with aspect-square */}
+                            <div className="relative w-[70vw] aspect-square max-w-[400px] md:w-full md:max-w-[600px] shrink-0 my-4 md:my-0">
 
                                 {/* ALL ELEMENTS SHARE THIS COORDINATE SYSTEM */}
 
