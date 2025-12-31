@@ -70,7 +70,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
     // ★ Collapsible Choices Panel
     const [isChoicesPanelOpen, setIsChoicesPanelOpen] = useState(true);
     // ★ Dynamic Scene Context - Shows current location/situation after initial world description
-    const [currentSceneContext, setCurrentSceneContext] = useState<string | null>(null);
+    const [currentSceneContext, setCurrentSceneContext] = useState<any | null>(null);
     // ★ Ending System - Epilogue state
     const [showEpilogue, setShowEpilogue] = useState(false);
     // ★ V6.1 Extended Epilogue Data
@@ -159,10 +159,12 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                                 setCurrentSceneContext(initialContext);
 
                                 // Save to persist immediately
-                                useSessionStore.getState().setActiveUI({
-                                    activeSceneImage: image,
-                                    activeSceneContext: initialContext
-                                });
+                                const currentChoices = useSessionStore.getState().activeChoices || [];
+                                useSessionStore.getState().setActiveUI(
+                                    currentChoices,
+                                    image,
+                                    initialContext
+                                );
                             }
                         } catch (e) {
                             console.error("Initial image failed", e);

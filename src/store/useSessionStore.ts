@@ -31,7 +31,7 @@ interface SessionState {
     // Active UI State (Persisted)
     activeChoices: any[] | null; // Using any[] to avoid circular dependency with Choice type for now
     activeSceneImage: string | null;
-    activeSceneContext: string | null;
+    activeSceneContext: any | null;
 
     // Actions
     setWorld: (world: WorldState) => void;
@@ -39,7 +39,7 @@ interface SessionState {
     setWorldGuidelines: (guidelines: WorldGuidelines | null) => void;
 
     // UI Persistence
-    setActiveUI: (choices: any[], image: string | null, context?: string | null) => void;
+    setActiveUI: (choices: any[], image: string | null, context?: any | null) => void;
 
     addLog: (entry: LogEntry) => void;
     updateLog: (id: string, updates: Partial<LogEntry>) => void;

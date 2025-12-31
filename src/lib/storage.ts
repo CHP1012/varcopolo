@@ -9,6 +9,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
  * @returns Promise resolving to the public download URL
  */
 export async function uploadImageToStorage(base64String: string, path: string): Promise<string> {
+    if (!storage) throw new Error("Firebase Storage not initialized");
     try {
         const storageRef = ref(storage, path);
         // uploadString automatically handles data_url format
@@ -28,6 +29,7 @@ export async function uploadImageToStorage(base64String: string, path: string): 
  * @param data Data object
  */
 export async function saveToFirestore(collectionName: string, docId: string, data: any): Promise<void> {
+    if (!db) throw new Error("Firebase Firestore not initialized");
     try {
         const docRef = doc(db, collectionName, docId);
         // Use setDoc with merge: true to avoid overwriting existing fields if not intended,
@@ -44,6 +46,10 @@ export async function saveToFirestore(collectionName: string, docId: string, dat
  * Retrieves a document from Firestore
  */
 export async function getFromFirestore(collectionName: string, docId: string): Promise<any | null> {
+    if (!db) {
+        console.error("Firebase Firestore not initialized");
+        return null;
+    }
     try {
         const docRef = doc(db, collectionName, docId);
         const docSnap = await getDoc(docRef);
