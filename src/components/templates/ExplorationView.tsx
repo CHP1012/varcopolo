@@ -860,7 +860,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
     }, [settings.bgmEnabled]);
 
     return (
-        <div className="flex flex-col h-screen w-full max-w-4xl mx-auto bg-background md:border-x md:border-ui-bg font-sans relative">
+        <div className="flex flex-col h-[100dvh] w-full max-w-4xl mx-auto bg-background md:border-x md:border-ui-bg font-sans relative overflow-hidden">
             {/* Intro Overlay */}
             {/* Intro Overlay */}
             <AnimatePresence>
@@ -926,17 +926,18 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                 </div>
                 <div className="flex items-center gap-4">
                     {/* Story Finish Button - V6.1 AI Activated */}
+                    {/* Story Finish Button - V6.1 AI Activated */}
                     {canFinishVoyage && (
                         <motion.button
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             whileHover={{ scale: 1.05 }}
                             onClick={() => handleCommand("나는 이 이야기를 여기서 마무리하기로 했다.")}
-                            className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors border border-blue-400/30 px-2 py-1.5 rounded animate-pulse-slow"
+                            className="bg-blue-900/30 text-blue-400 hover:text-blue-200 hover:bg-blue-800/50 border border-blue-500/50 flex items-center gap-1.5 px-3 py-1.5 rounded transition-all animate-pulse-slow ml-auto"
                             title="항해 종료 (Finish Voyage)"
                         >
-                            <BookOpen size={14} />
-                            <span className="hidden md:inline font-retro tracking-wider">항해 종료</span>
+                            <BookOpen size={16} />
+                            <span className="text-xs font-bold font-retro tracking-wider whitespace-nowrap">항해 종료</span>
                         </motion.button>
                     )}
 
