@@ -993,9 +993,9 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                 </div>
             </header>
 
-            {/* Visualizer (Image) - Aspect ratio matches generated image (4:3) */}
+            {/* Visualizer (Image) - Fills vertical space on mobile, fixed aspect on desktop */}
             <div
-                className="w-full aspect-[4/3] md:aspect-video bg-black border-b border-ui-border relative overflow-hidden shrink-0 cursor-pointer"
+                className="w-full flex-1 md:flex-none md:aspect-video bg-black border-b border-ui-border relative overflow-hidden md:shrink-0 cursor-pointer"
                 onClick={() => setIsNarrativeOverlayVisible(!isNarrativeOverlayVisible)}
             >
                 {sceneImage ? (
@@ -1058,7 +1058,10 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                     {/* Gradient overlay for readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
                     {/* Narrative content - expanded for more text visibility */}
-                    <div data-overlay-scroll className="relative z-10 p-4 max-h-[80%] overflow-y-auto pointer-events-auto scrollbar-hide">
+                    <div
+                        data-overlay-scroll
+                        className={`relative z-10 p-4 max-h-[80%] pointer-events-auto scrollbar-hide ${isNarrativeOverlayVisible ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                    >
                         <NarrativeLog entries={logs} isLoading={isProcessing} compact />
                     </div>
                 </motion.div>
