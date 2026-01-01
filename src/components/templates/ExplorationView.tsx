@@ -1057,8 +1057,8 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                 >
                     {/* Gradient overlay for readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
-                    {/* Narrative content */}
-                    <div data-overlay-scroll className="relative z-10 p-4 max-h-[60%] overflow-y-auto pointer-events-auto scrollbar-hide">
+                    {/* Narrative content - expanded for more text visibility */}
+                    <div data-overlay-scroll className="relative z-10 p-4 max-h-[80%] overflow-y-auto pointer-events-auto scrollbar-hide">
                         <NarrativeLog entries={logs} isLoading={isProcessing} compact />
                     </div>
                 </motion.div>
@@ -1102,8 +1102,8 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
             </div>
 
             {/* Controls (Footer) */}
-            {/* ★ Collapsible Choices Panel */}
-            <div className="border-t border-ui-border bg-background/95 backdrop-blur z-10 shrink-0">
+            {/* ★ Collapsible Choices Panel - pushed to bottom with mt-auto */}
+            <div className="border-t border-ui-border bg-background/95 backdrop-blur z-10 shrink-0 mt-auto">
                 {/* Toggle Handle */}
                 <button
                     onClick={() => setIsChoicesPanelOpen(!isChoicesPanelOpen)}
