@@ -69,6 +69,8 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
     const [showIntro, setShowIntro] = useState(initialLogs.length <= 1);
     // ★ Collapsible Choices Panel
     const [isChoicesPanelOpen, setIsChoicesPanelOpen] = useState(true);
+    // ★ Mobile: Narrative Overlay on Image (tap to toggle)
+    const [isNarrativeOverlayVisible, setIsNarrativeOverlayVisible] = useState(true);
     // ★ Dynamic Scene Context - Shows current location/situation after initial world description
     const [currentSceneContext, setCurrentSceneContext] = useState<any | null>(null);
     // ★ Ending System - Epilogue state
@@ -989,8 +991,11 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                 </div>
             </header>
 
-            {/* Visualizer (Image) - Using balanced aspect ratio for better visibility */}
-            <div className="w-full aspect-[4/3] md:aspect-video bg-black border-b border-ui-border relative overflow-hidden shrink-0">
+            {/* Visualizer (Image) - Larger on mobile for overlay UI */}
+            <div
+                className="w-full aspect-[3/4] md:aspect-video bg-black border-b border-ui-border relative overflow-hidden shrink-0 cursor-pointer"
+                onClick={() => setIsNarrativeOverlayVisible(!isNarrativeOverlayVisible)}
+            >
                 {sceneImage ? (
                     <img
                         src={sceneImage}
@@ -1037,12 +1042,50 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                         </p>
                     </div>
                 )}
+
+                {/* ★ MOBILE: Narrative Log Overlay on Image */}
+                <AnimatePresence>
+                    {isNarrativeOverlayVisible && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute inset-0 flex flex-col justify-end pointer-events-none md:hidden"
+                        >
+                            {/* Gradient overlay for readability */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+                            {/* Narrative content */}
+                            <div className="relative z-10 p-4 max-h-[60%] overflow-y-auto pointer-events-auto scrollbar-hide">
+                                <NarrativeLog entries={logs} isLoading={isProcessing} compact />
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Toggle Hint - Mobile Only */}
+                <div className="absolute top-2 right-2 md:hidden z-20">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsNarrativeOverlayVisible(!isNarrativeOverlayVisible);
+                        }}
+                        className={clsx(
+                            "px-2 py-1 rounded text-[10px] font-mono transition-all border backdrop-blur-sm",
+                            isNarrativeOverlayVisible
+                                ? "bg-primary/20 text-primary border-primary/30"
+                                : "bg-black/50 text-secondary/70 border-secondary/30"
+                        )}
+                    >
+                        {isNarrativeOverlayVisible ? "텍스트 숨김" : "텍스트 보기"}
+                    </button>
+                </div>
             </div>
 
-            {/* Narrative Log (Scrollable) */}
-            < div className="flex-1 min-h-0 flex flex-col relative bg-background/50" >
+            {/* Narrative Log (Scrollable) - DESKTOP ONLY (Mobile uses overlay) */}
+            <div className="flex-1 min-h-0 flex-col relative bg-background/50 hidden md:flex">
                 <NarrativeLog entries={logs} isLoading={isProcessing} />
-            </div >
+            </div>
 
             {/* Controls (Footer) */}
             {/* ★ Collapsible Choices Panel */}

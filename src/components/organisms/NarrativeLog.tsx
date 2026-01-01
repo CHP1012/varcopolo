@@ -10,6 +10,7 @@ import '@/styles/textFX.css'; // Cinematic TextFX Styles
 interface NarrativeLogProps {
     entries: LogEntry[];
     isLoading?: boolean; // ★ Show loading indicator
+    compact?: boolean; // ★ Compact mode for mobile overlay (smaller text, less padding)
 }
 
 // ★ Loading Dots Animation Component
@@ -31,7 +32,7 @@ function LoadingDots() {
     );
 }
 
-export default function NarrativeLog({ entries, isLoading = false }: NarrativeLogProps) {
+export default function NarrativeLog({ entries, isLoading = false, compact = false }: NarrativeLogProps) {
     const bottomRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [forceUpdateCount, setForceUpdate] = useState(0);
@@ -115,7 +116,10 @@ export default function NarrativeLog({ entries, isLoading = false }: NarrativeLo
     }, [entries.length, isLoading]); // ★ Also scroll when loading state changes
 
     return (
-        <div ref={containerRef} className="h-full w-full overflow-y-auto p-4 space-y-6 scrollbar-hide touch-auto font-body text-foreground">
+        <div ref={containerRef} className={clsx(
+            "h-full w-full overflow-y-auto scrollbar-hide touch-auto font-body text-foreground",
+            compact ? "p-2 space-y-2 text-sm" : "p-4 space-y-6"
+        )}>
             <AnimatePresence>
                 {(() => {
                     // Logic to find the first incomplete entry
