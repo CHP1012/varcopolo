@@ -17,7 +17,7 @@ interface ChoiceViewProps {
 
 export default function ChoiceView({ choices, onSelect, disabled = false }: ChoiceViewProps) {
     return (
-        <div className="flex flex-col gap-2 p-4 border-t border-secondary/20 bg-black/40">
+        <div className="flex flex-col gap-2 p-2 md:p-4 border-t border-secondary/20 bg-black/40">
             {choices.map((choice) => (
                 <button
                     key={choice.id}

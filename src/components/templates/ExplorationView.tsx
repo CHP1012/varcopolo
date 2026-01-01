@@ -1045,25 +1045,23 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                     </div>
                 )}
 
-                {/* ★ MOBILE: Narrative Log Overlay on Image */}
-                <AnimatePresence>
-                    {isNarrativeOverlayVisible && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 20 }}
-                            transition={{ duration: 0.3 }}
-                            className="absolute inset-0 flex flex-col justify-end pointer-events-none md:hidden"
-                        >
-                            {/* Gradient overlay for readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-                            {/* Narrative content */}
-                            <div data-overlay-scroll className="relative z-10 p-4 max-h-[60%] overflow-y-auto pointer-events-auto scrollbar-hide">
-                                <NarrativeLog entries={logs} isLoading={isProcessing} compact />
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                {/* ★ MOBILE: Narrative Log Overlay on Image - Always mounted to preserve scroll */}
+                <motion.div
+                    initial={false}
+                    animate={{
+                        opacity: isNarrativeOverlayVisible ? 1 : 0,
+                        y: isNarrativeOverlayVisible ? 0 : 20
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className={`absolute inset-0 flex flex-col justify-end md:hidden ${isNarrativeOverlayVisible ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                >
+                    {/* Gradient overlay for readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
+                    {/* Narrative content */}
+                    <div data-overlay-scroll className="relative z-10 p-4 max-h-[60%] overflow-y-auto pointer-events-auto scrollbar-hide">
+                        <NarrativeLog entries={logs} isLoading={isProcessing} compact />
+                    </div>
+                </motion.div>
 
                 {/* Toggle Hint - Mobile Only */}
                 <div className="absolute top-2 right-2 md:hidden z-20">
