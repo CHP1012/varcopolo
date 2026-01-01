@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { LogEntry, WorldState, Character, Item, Entity, NPCState, NPCMemory, WorldTime, GameTime } from '@/types/game';
+import { LogEntry, WorldState, Character, Item, Entity, NPCState, NPCMemory, WorldTime, GameTime, NPCRelationship, WorldEvent } from '@/types/game';
 import { WorldRuleset, WorldGuidelines } from '@/types/worldRuleset';
 import { indexedDBStorage } from '@/utils/indexedDBStorage';
 
@@ -26,6 +26,9 @@ interface SessionState {
     npcStates: Record<string, NPCState>;
     // ★ Living World: World Time System
     worldTime: WorldTime;
+    // ★ Phase 5: Relationship and Event System
+    relationships: NPCRelationship[];
+    eventQueue: WorldEvent[];
 
     // UI/Flow State
     logs: LogEntry[];
@@ -71,6 +74,11 @@ interface SessionState {
     // ★ Living World: Time Control Actions
     advanceGameTime: (minutes: number) => void;
     setWorldTimePaused: (paused: boolean) => void;
+    // ★ Phase 5: Relationship and Event Actions
+    updateRelationship: (fromNpcId: string, toNpcId: string, changes: Partial<Omit<NPCRelationship, 'fromNpcId' | 'toNpcId'>>) => void;
+    getRelationship: (fromNpcId: string, toNpcId: string) => NPCRelationship | undefined;
+    addEvent: (event: Omit<WorldEvent, 'id' | 'consumed'>) => void;
+    processEventQueue: () => WorldEvent[];
 
     resetSession: () => void;
 }
@@ -100,6 +108,9 @@ export const useSessionStore = create<SessionState>()(
                 timeRatio: 1, // 1 real second = 1 game minute
                 isPaused: false
             },
+            // ★ Phase 5: Relationship and Event System
+            relationships: [],
+            eventQueue: [],
 
             // Active UI State (Persisted)
             activeChoices: null,
@@ -311,6 +322,81 @@ export const useSessionStore = create<SessionState>()(
             setWorldTimePaused: (paused) => set((state) => ({
                 worldTime: { ...state.worldTime, isPaused: paused }
             })),
+
+            // ★ Phase 5: Relationship and Event Actions
+            updateRelationship: (fromNpcId, toNpcId, changes) => set((state) => {
+                const existingIndex = state.relationships.findIndex(
+                    r => r.fromNpcId === fromNpcId && r.toNpcId === toNpcId
+                );
+
+                if (existingIndex >= 0) {
+                    // Update existing relationship
+                    const updated = [...state.relationships];
+                    updated[existingIndex] = { ...updated[existingIndex], ...changes };
+                    return { relationships: updated };
+                } else {
+                    // Create new relationship
+                    const newRelationship: NPCRelationship = {
+                        fromNpcId,
+                        toNpcId,
+                        type: 'stranger',
+                        affection: 0,
+                        trust: 0,
+                        respect: 0,
+                        history: [],
+                        ...changes
+                    };
+                    return { relationships: [...state.relationships, newRelationship] };
+                }
+            }),
+
+            getRelationship: (fromNpcId, toNpcId) => {
+                const state = get();
+                return state.relationships.find(
+                    r => r.fromNpcId === fromNpcId && r.toNpcId === toNpcId
+                );
+            },
+
+            addEvent: (eventData) => set((state) => ({
+                eventQueue: [...state.eventQueue, {
+                    ...eventData,
+                    id: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    consumed: false
+                }]
+            })),
+
+            processEventQueue: () => {
+                const state = get();
+                const { currentTime } = state.worldTime;
+
+                // Find events ready to trigger
+                const readyEvents = state.eventQueue
+                    .filter(e => !e.consumed)
+                    .filter(e => {
+                        if (e.triggerType === 'immediate') return true;
+                        if (e.triggerType === 'time' && e.triggerTime) {
+                            return currentTime.day >= e.triggerTime.day &&
+                                currentTime.hour >= e.triggerTime.hour &&
+                                currentTime.minute >= e.triggerTime.minute;
+                        }
+                        // TODO: Check conditions for 'condition' type
+                        return false;
+                    })
+                    .sort((a, b) => b.priority - a.priority);
+
+                // Mark as consumed
+                if (readyEvents.length > 0) {
+                    set((state) => ({
+                        eventQueue: state.eventQueue.map(e =>
+                            readyEvents.some(re => re.id === e.id)
+                                ? { ...e, consumed: true }
+                                : e
+                        )
+                    }));
+                }
+
+                return readyEvents;
+            },
 
             resetSession: () => set((state) => ({
                 currentWorld: null,

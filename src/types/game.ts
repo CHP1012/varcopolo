@@ -142,3 +142,45 @@ export interface WorldTime {
     timeRatio: number;          // Real seconds per game minute (default: 1)
     isPaused: boolean;
 }
+
+// ★ Phase 5: NPC Relationship System
+export type RelationshipType = 'stranger' | 'acquaintance' | 'friend' | 'close_friend' | 'rival' | 'enemy' | 'lover' | 'family';
+
+export interface NPCRelationship {
+    fromNpcId: string;          // Who has this feeling
+    toNpcId: string;            // Towards whom
+    type: RelationshipType;     // Relationship category
+    affection: number;          // -100 to 100 (love to hate)
+    trust: number;              // -100 to 100 (distrust to trust)
+    respect: number;            // -100 to 100 (contempt to admiration)
+    history: string[];          // Key events that shaped this relationship
+    lastInteraction?: number;   // Last time they interacted (game time)
+}
+
+// ★ Phase 5: Event Queue System (Chain Reactions)
+export type EventTriggerType = 'time' | 'condition' | 'immediate' | 'random';
+
+export interface EventCondition {
+    type: 'relationship' | 'npc_state' | 'player_action' | 'time_of_day' | 'game_time';
+    npcId?: string;
+    targetNpcId?: string;
+    operator: '>' | '<' | '==' | '!=' | 'contains';
+    value: string | number | boolean;
+}
+
+export interface WorldEvent {
+    id: string;
+    name: string;               // Event name for debugging
+    triggerType: EventTriggerType;
+    triggerTime?: GameTime;     // For 'time' trigger
+    conditions?: EventCondition[]; // All must be true to trigger
+    action: {
+        type: 'npc_dialogue' | 'npc_move' | 'relationship_change' | 'spawn_event' | 'world_change';
+        npcId?: string;
+        targetNpcId?: string;
+        data: Record<string, any>;
+    };
+    chainEvents?: string[];     // Event IDs to trigger after this one
+    consumed: boolean;          // True if already executed
+    priority: number;           // Higher = process first
+}
