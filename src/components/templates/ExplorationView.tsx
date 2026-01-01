@@ -31,7 +31,7 @@ interface ExplorationViewProps {
 // const ENABLE_AUTO_SFX = false;
 
 export default function ExplorationView({ world: initialWorld, player: initialPlayer, initialLogs = [], onExit }: ExplorationViewProps) {
-    const { addLog, updatePlayer, addCharacter, logs: storedLogs, currentWorld, appearanceTags, activeChoices, activeSceneImage, setActiveUI, settings, voiceMap } = useSessionStore();
+    const { addLog, updatePlayer, addCharacter, logs: storedLogs, currentWorld, appearanceTags, activeChoices, activeSceneImage, setActiveUI, settings, voiceMap, addNPCMemory } = useSessionStore();
     const logs = storedLogs.length > 0 ? storedLogs : initialLogs;
 
     // ★ Initialize with persisted state if available
@@ -390,6 +390,37 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
 
             // 4. Update Choices
             updateChoices(result.choices);
+
+            // ★ Living World: Auto-save NPC memories from this interaction
+            try {
+                const segments = result.narrative_segments || [];
+                for (const segment of segments) {
+                    if (segment.character_id && segment.type === 'dialogue') {
+                        addNPCMemory(segment.character_id, {
+                            type: 'conversation',
+                            content: `플레이어에게 "${segment.text?.slice(0, 50) || '대화'}..."라고 말했다.`,
+                            participants: ['player', segment.character_id],
+                            emotionalImpact: segment.emotion === 'angry' ? -3 : segment.emotion === 'happy' ? 2 : 0,
+                            timestamp: Date.now()
+                        });
+                    }
+                }
+                // Also save player action as observable event
+                if (segments.length > 0) {
+                    const firstNPC = segments.find(s => s.character_id);
+                    if (firstNPC && firstNPC.character_id) {
+                        addNPCMemory(firstNPC.character_id, {
+                            type: 'observation',
+                            content: `플레이어가 "${actionText}"를 했다.`,
+                            participants: ['player'],
+                            emotionalImpact: 0,
+                            timestamp: Date.now()
+                        });
+                    }
+                }
+            } catch (memErr) {
+                console.warn('[LivingWorld] Memory save failed (non-critical):', memErr);
+            }
 
             // 5. Update Image (Background) & Audio (SFX) & Voice (TTS)
 
