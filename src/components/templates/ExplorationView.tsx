@@ -1097,7 +1097,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
             </div>
 
             {/* Narrative Log (Scrollable) - DESKTOP ONLY (Mobile uses overlay) */}
-            <div className="flex-1 min-h-0 flex-col relative bg-background/50 hidden md:flex">
+            <div className="min-h-0 flex-col relative bg-background/50 hidden md:flex md:flex-1">
                 <NarrativeLog entries={logs} isLoading={isProcessing} />
             </div>
 
