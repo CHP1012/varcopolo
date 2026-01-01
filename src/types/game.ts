@@ -104,3 +104,26 @@ export interface Entity {
     lore_tags?: string[];
     interaction_tags?: string[];
 }
+
+// ★ Living World: NPC Memory System
+export interface NPCMemory {
+    id: string;
+    npcId: string;              // Which NPC has this memory
+    type: 'conversation' | 'event' | 'observation' | 'rumor';
+    content: string;            // What happened
+    participants: string[];     // Who was involved
+    emotionalImpact: number;    // -10 to 10 (how much it affected the NPC)
+    timestamp: number;          // When it happened (game time)
+    decayRate?: number;         // How fast the memory fades (0-1, default 0.1)
+    isImportant?: boolean;      // Never decays if true
+}
+
+// ★ Living World: NPC Extended State
+export interface NPCState {
+    entityId: string;           // Links to Entity
+    mood: string;               // Current emotional state
+    trust: Record<string, number>; // Trust level with other entities
+    currentGoal?: string;       // What they're trying to do
+    memories: NPCMemory[];      // Their memories
+    lastInteractionTime?: number;
+}

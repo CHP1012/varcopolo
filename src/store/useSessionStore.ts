@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { LogEntry, WorldState, Character, Item, Entity } from '@/types/game';
+import { LogEntry, WorldState, Character, Item, Entity, NPCState, NPCMemory } from '@/types/game';
 import { WorldRuleset, WorldGuidelines } from '@/types/worldRuleset';
 import { indexedDBStorage } from '@/utils/indexedDBStorage';
 
@@ -22,6 +22,8 @@ interface SessionState {
     appearanceTags: string[];
     // ★ Persistent Voice Map (Character Name -> Voice UUID)
     voiceMap: Record<string, string>;
+    // ★ Living World: NPC States with Memories
+    npcStates: Record<string, NPCState>;
 
     // UI/Flow State
     logs: LogEntry[];
@@ -54,6 +56,10 @@ interface SessionState {
     updateEntity: (entityId: string, updates: Partial<Entity>) => void;
     updateAppearanceTags: (tags: string[]) => void;
     updateVoiceMap: (characterName: string, voiceUuid: string) => void;
+    // ★ Living World: NPC Memory Actions
+    addNPCMemory: (npcId: string, memory: Omit<NPCMemory, 'id' | 'npcId'>) => void;
+    updateNPCState: (npcId: string, updates: Partial<Omit<NPCState, 'entityId' | 'memories'>>) => void;
+    getNPCMemories: (npcId: string, limit?: number) => NPCMemory[];
     // Generic Settings
     settings: {
         sfxEnabled: boolean;
@@ -81,6 +87,7 @@ export const useSessionStore = create<SessionState>()(
             sessionKnowledge: [],
             appearanceTags: ['hooded_figure', 'unknown_traveler'], // Default initial tags
             voiceMap: {}, // Initialize empty map
+            npcStates: {}, // ★ Living World: NPC states with memories
 
             // Active UI State (Persisted)
             activeChoices: null,
@@ -193,6 +200,55 @@ export const useSessionStore = create<SessionState>()(
             updateVoiceMap: (name, uuid) => set((state) => ({
                 voiceMap: { ...state.voiceMap, [name]: uuid }
             })),
+
+            // ★ Living World: NPC Memory Actions
+            addNPCMemory: (npcId, memoryData) => set((state) => {
+                const existingState = state.npcStates[npcId] || {
+                    entityId: npcId,
+                    mood: 'neutral',
+                    trust: {},
+                    memories: []
+                };
+                const newMemory = {
+                    ...memoryData,
+                    id: `mem-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    npcId
+                };
+                return {
+                    npcStates: {
+                        ...state.npcStates,
+                        [npcId]: {
+                            ...existingState,
+                            memories: [...existingState.memories, newMemory]
+                        }
+                    }
+                };
+            }),
+
+            updateNPCState: (npcId, updates) => set((state) => {
+                const existingState = state.npcStates[npcId] || {
+                    entityId: npcId,
+                    mood: 'neutral',
+                    trust: {},
+                    memories: []
+                };
+                return {
+                    npcStates: {
+                        ...state.npcStates,
+                        [npcId]: { ...existingState, ...updates }
+                    }
+                };
+            }),
+
+            getNPCMemories: (npcId, limit = 10) => {
+                const state = get();
+                const npcState = state.npcStates[npcId];
+                if (!npcState) return [];
+                // Return most recent memories, sorted by timestamp descending
+                return [...npcState.memories]
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, limit);
+            },
 
             updateSettings: (newSettings) => set((state) => ({
                 settings: { ...state.settings, ...newSettings }
