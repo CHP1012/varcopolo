@@ -68,6 +68,9 @@ interface SessionState {
         bgmEnabled: boolean;
     };
     updateSettings: (settings: Partial<SessionState['settings']>) => void;
+    // ★ Living World: Time Control Actions
+    advanceGameTime: (minutes: number) => void;
+    setWorldTimePaused: (paused: boolean) => void;
 
     resetSession: () => void;
 }
@@ -261,6 +264,52 @@ export const useSessionStore = create<SessionState>()(
 
             updateSettings: (newSettings) => set((state) => ({
                 settings: { ...state.settings, ...newSettings }
+            })),
+
+            // ★ Living World: Time Control Actions
+            advanceGameTime: (minutes) => set((state) => {
+                const { currentTime } = state.worldTime;
+                let newMinute = currentTime.minute + minutes;
+                let newHour = currentTime.hour;
+                let newDay = currentTime.day;
+
+                // Minute overflow
+                while (newMinute >= 60) {
+                    newMinute -= 60;
+                    newHour++;
+                }
+
+                // Hour overflow
+                while (newHour >= 24) {
+                    newHour -= 24;
+                    newDay++;
+                }
+
+                // Calculate time of day
+                let timeOfDay: 'dawn' | 'morning' | 'noon' | 'afternoon' | 'evening' | 'night' | 'midnight';
+                if (newHour >= 5 && newHour < 7) timeOfDay = 'dawn';
+                else if (newHour >= 7 && newHour < 12) timeOfDay = 'morning';
+                else if (newHour >= 12 && newHour < 14) timeOfDay = 'noon';
+                else if (newHour >= 14 && newHour < 17) timeOfDay = 'afternoon';
+                else if (newHour >= 17 && newHour < 20) timeOfDay = 'evening';
+                else if (newHour >= 20 && newHour < 24) timeOfDay = 'night';
+                else timeOfDay = 'midnight';
+
+                return {
+                    worldTime: {
+                        ...state.worldTime,
+                        currentTime: {
+                            day: newDay,
+                            hour: newHour,
+                            minute: newMinute,
+                            timeOfDay
+                        }
+                    }
+                };
+            }),
+
+            setWorldTimePaused: (paused) => set((state) => ({
+                worldTime: { ...state.worldTime, isPaused: paused }
             })),
 
             resetSession: () => set((state) => ({

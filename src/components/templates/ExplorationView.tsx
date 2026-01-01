@@ -31,7 +31,7 @@ interface ExplorationViewProps {
 // const ENABLE_AUTO_SFX = false;
 
 export default function ExplorationView({ world: initialWorld, player: initialPlayer, initialLogs = [], onExit }: ExplorationViewProps) {
-    const { addLog, updatePlayer, addCharacter, logs: storedLogs, currentWorld, appearanceTags, activeChoices, activeSceneImage, setActiveUI, settings, voiceMap, addNPCMemory } = useSessionStore();
+    const { addLog, updatePlayer, addCharacter, logs: storedLogs, currentWorld, appearanceTags, activeChoices, activeSceneImage, setActiveUI, settings, voiceMap, addNPCMemory, advanceGameTime, worldTime } = useSessionStore();
     const logs = storedLogs.length > 0 ? storedLogs : initialLogs;
 
     // ★ Initialize with persisted state if available
@@ -996,6 +996,17 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
         };
     }, []);
 
+    // ★ Living World: Time Tick Engine - Advance game time every second
+    useEffect(() => {
+        if (showIntro || !currentWorld || worldTime.isPaused) return;
+
+        const timeTickInterval = setInterval(() => {
+            advanceGameTime(1); // 1 real second = 1 game minute
+        }, 1000);
+
+        return () => clearInterval(timeTickInterval);
+    }, [showIntro, currentWorld, worldTime.isPaused, advanceGameTime]);
+
     return (
         <div className="flex flex-col h-[100dvh] w-full max-w-4xl mx-auto bg-background md:border-x md:border-ui-bg font-sans relative overflow-hidden">
             {/* Intro Overlay */}
@@ -1058,7 +1069,18 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                     )}
                     <div className="min-w-0">
                         <h2 className="text-base md:text-lg font-bold text-primary tracking-widest uppercase font-retro truncate">{currentWorld.name}</h2>
-                        <p className="text-[10px] md:text-xs text-secondary/80 font-mono truncate">{currentWorld.timeOfDay} | Threat: {currentWorld.threatLevel}</p>
+                        <p className="text-[10px] md:text-xs text-secondary/80 font-mono truncate">
+                            Day {worldTime.currentTime.day} | {String(worldTime.currentTime.hour).padStart(2, '0')}:{String(worldTime.currentTime.minute).padStart(2, '0')}
+                            <span className="text-primary/60 ml-1">
+                                ({worldTime.currentTime.timeOfDay === 'dawn' ? '새벽' :
+                                    worldTime.currentTime.timeOfDay === 'morning' ? '아침' :
+                                        worldTime.currentTime.timeOfDay === 'noon' ? '정오' :
+                                            worldTime.currentTime.timeOfDay === 'afternoon' ? '오후' :
+                                                worldTime.currentTime.timeOfDay === 'evening' ? '저녁' :
+                                                    worldTime.currentTime.timeOfDay === 'night' ? '밤' : '한밤중'})
+                            </span>
+                            {' '}| Threat: {currentWorld.threatLevel}
+                        </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
