@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { LogEntry, WorldState, Character, Item, Entity, NPCState, NPCMemory } from '@/types/game';
+import { LogEntry, WorldState, Character, Item, Entity, NPCState, NPCMemory, WorldTime, GameTime } from '@/types/game';
 import { WorldRuleset, WorldGuidelines } from '@/types/worldRuleset';
 import { indexedDBStorage } from '@/utils/indexedDBStorage';
 
@@ -24,6 +24,8 @@ interface SessionState {
     voiceMap: Record<string, string>;
     // ★ Living World: NPC States with Memories
     npcStates: Record<string, NPCState>;
+    // ★ Living World: World Time System
+    worldTime: WorldTime;
 
     // UI/Flow State
     logs: LogEntry[];
@@ -88,6 +90,13 @@ export const useSessionStore = create<SessionState>()(
             appearanceTags: ['hooded_figure', 'unknown_traveler'], // Default initial tags
             voiceMap: {}, // Initialize empty map
             npcStates: {}, // ★ Living World: NPC states with memories
+            // ★ Living World: World Time
+            worldTime: {
+                currentTime: { day: 1, hour: 8, minute: 0, timeOfDay: 'morning' as const },
+                realStartTime: Date.now(),
+                timeRatio: 1, // 1 real second = 1 game minute
+                isPaused: false
+            },
 
             // Active UI State (Persisted)
             activeChoices: null,

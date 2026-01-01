@@ -127,3 +127,18 @@ export interface NPCState {
     memories: NPCMemory[];      // Their memories
     lastInteractionTime?: number;
 }
+
+// ★ Living World: Time System
+export interface GameTime {
+    day: number;                // Day counter (starts at 1)
+    hour: number;               // 0-23
+    minute: number;             // 0-59
+    timeOfDay: 'dawn' | 'morning' | 'noon' | 'afternoon' | 'evening' | 'night' | 'midnight';
+}
+
+export interface WorldTime {
+    currentTime: GameTime;
+    realStartTime: number;      // Real timestamp when game started
+    timeRatio: number;          // Real seconds per game minute (default: 1)
+    isPaused: boolean;
+}
