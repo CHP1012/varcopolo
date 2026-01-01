@@ -94,6 +94,8 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
 
     // API Call Lock (Prevent double invocation in StrictMode)
     const isFetchingImageRef = useRef(false);
+    // ★ Mobile Overlay: Preserve scroll position when toggling
+    const overlayScrollPositionRef = useRef<number>(0);
 
     const [connectionError, setConnectionError] = useState(false);
     const [lastFailedAction, setLastFailedAction] = useState<string | null>(null);
@@ -991,9 +993,9 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                 </div>
             </header>
 
-            {/* Visualizer (Image) - Larger on mobile for overlay UI */}
+            {/* Visualizer (Image) - Aspect ratio matches generated image (4:3) */}
             <div
-                className="w-full aspect-[3/4] md:aspect-video bg-black border-b border-ui-border relative overflow-hidden shrink-0 cursor-pointer"
+                className="w-full aspect-[4/3] md:aspect-video bg-black border-b border-ui-border relative overflow-hidden shrink-0 cursor-pointer"
                 onClick={() => setIsNarrativeOverlayVisible(!isNarrativeOverlayVisible)}
             >
                 {sceneImage ? (
@@ -1056,7 +1058,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                             {/* Gradient overlay for readability */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
                             {/* Narrative content */}
-                            <div className="relative z-10 p-4 max-h-[60%] overflow-y-auto pointer-events-auto scrollbar-hide">
+                            <div data-overlay-scroll className="relative z-10 p-4 max-h-[60%] overflow-y-auto pointer-events-auto scrollbar-hide">
                                 <NarrativeLog entries={logs} isLoading={isProcessing} compact />
                             </div>
                         </motion.div>
@@ -1068,7 +1070,21 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
+                            // Save current scroll position before hiding
+                            const overlayContainer = document.querySelector('[data-overlay-scroll]');
+                            if (overlayContainer && isNarrativeOverlayVisible) {
+                                overlayScrollPositionRef.current = overlayContainer.scrollTop;
+                            }
                             setIsNarrativeOverlayVisible(!isNarrativeOverlayVisible);
+                            // Restore scroll position after showing
+                            if (!isNarrativeOverlayVisible) {
+                                setTimeout(() => {
+                                    const container = document.querySelector('[data-overlay-scroll]');
+                                    if (container) {
+                                        container.scrollTop = overlayScrollPositionRef.current;
+                                    }
+                                }, 50);
+                            }
                         }}
                         className={clsx(
                             "px-2 py-1 rounded text-[10px] font-mono transition-all border backdrop-blur-sm",
