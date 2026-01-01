@@ -1000,7 +1000,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                     <img
                         src={sceneImage}
                         alt="Scene Visualization"
-                        className={`w-full h-full object-cover transition-opacity duration-1000 ${showIntro ? 'opacity-0' : 'opacity-80'}`}
+                        className={`w-full h-full object-contain transition-opacity duration-1000 ${showIntro ? 'opacity-0' : 'opacity-80'}`}
                     />
                 ) : (
                     /* World Construction Loading Effect */
