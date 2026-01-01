@@ -100,6 +100,11 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
     const [connectionError, setConnectionError] = useState(false);
     const [lastFailedAction, setLastFailedAction] = useState<string | null>(null);
 
+    // ★ Living World: Player Inactivity Timer
+    const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const lastActivityTimeRef = useRef<number>(Date.now());
+    const inactivityLevelRef = useRef<number>(0); // 0=normal, 1=30s, 2=60s, 3=90s
+
     // ★ BGM Management Ref
     const bgmRef = useRef<HTMLAudioElement | null>(null);
 
@@ -862,6 +867,103 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
             }
         }
     }, [settings.bgmEnabled]);
+
+    // ★ Living World: Reset inactivity timer on any player activity
+    const resetInactivityTimer = () => {
+        lastActivityTimeRef.current = Date.now();
+        inactivityLevelRef.current = 0;
+    };
+
+    // ★ Living World: Trigger autonomous NPC response when player is inactive
+    const triggerNPCAutonomousResponse = async (level: number) => {
+        if (isProcessingRef.current || showIntro || !currentWorld || !logs.length) return;
+
+        // Get the last speaking NPC from logs
+        const lastNarrativeLog = [...logs].reverse().find(l => l.type === 'NARRATIVE');
+        if (!lastNarrativeLog) return;
+
+        const inactivityContexts = [
+            "", // level 0 - no action
+            "(플레이어가 30초간 아무 반응이 없습니다. NPC가 의아해하거나 재촉합니다.)",
+            "(플레이어가 60초간 침묵합니다. NPC가 짜증을 내거나 걱정합니다.)",
+            "(플레이어가 90초 이상 반응이 없습니다. NPC가 상황에 맞게 자율적으로 행동합니다. 떠나거나, 다른 행동을 하거나, 상황이 변화합니다.)"
+        ];
+
+        const context = inactivityContexts[level] || "";
+        if (!context) return;
+
+        console.log(`[LivingWorld] 🌍 Triggering autonomous NPC response (Level ${level})`);
+
+        try {
+            isProcessingRef.current = true;
+            setIsProcessing(true);
+
+            const { processTurnAction } = await import('@/actions/game');
+            const result = await processTurnAction(
+                logs,
+                currentWorld?.description || '',
+                `[SYSTEM: NPC 자율 반응] ${context}`,
+                appearanceTags || [],
+                currentWorld?.knownAppearances || []
+            );
+
+            if (result?.narrative) {
+                addLog({
+                    id: `npc-auto-${Date.now()}`,
+                    type: 'NARRATIVE',
+                    text: result.narrative,
+                    timestamp: Date.now()
+                });
+
+                if (result.choices) {
+                    updateChoices(result.choices);
+                }
+            }
+        } catch (err) {
+            console.error("[LivingWorld] Autonomous response failed:", err);
+        } finally {
+            isProcessingRef.current = false;
+            setIsProcessing(false);
+        }
+    };
+
+    // ★ Living World: Inactivity check interval
+    useEffect(() => {
+        if (showIntro || !currentWorld) return;
+
+        const checkInterval = setInterval(() => {
+            const elapsed = Date.now() - lastActivityTimeRef.current;
+            const currentLevel = inactivityLevelRef.current;
+
+            // Level thresholds: 30s, 60s, 90s
+            const thresholds = [30000, 60000, 90000];
+
+            for (let i = currentLevel; i < thresholds.length; i++) {
+                if (elapsed >= thresholds[i] && inactivityLevelRef.current === i) {
+                    inactivityLevelRef.current = i + 1;
+                    triggerNPCAutonomousResponse(i + 1);
+                    break;
+                }
+            }
+        }, 5000); // Check every 5 seconds
+
+        return () => clearInterval(checkInterval);
+    }, [showIntro, currentWorld]);
+
+    // ★ Living World: Reset timer on user interaction
+    useEffect(() => {
+        const handleUserActivity = () => resetInactivityTimer();
+
+        window.addEventListener('click', handleUserActivity);
+        window.addEventListener('keydown', handleUserActivity);
+        window.addEventListener('touchstart', handleUserActivity);
+
+        return () => {
+            window.removeEventListener('click', handleUserActivity);
+            window.removeEventListener('keydown', handleUserActivity);
+            window.removeEventListener('touchstart', handleUserActivity);
+        };
+    }, []);
 
     return (
         <div className="flex flex-col h-[100dvh] w-full max-w-4xl mx-auto bg-background md:border-x md:border-ui-bg font-sans relative overflow-hidden">
