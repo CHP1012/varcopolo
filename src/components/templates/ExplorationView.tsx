@@ -1060,7 +1060,7 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
                     {/* Narrative content - expanded for more text visibility */}
                     <div
                         data-overlay-scroll
-                        className={`relative z-10 p-4 max-h-[80%] pointer-events-auto scrollbar-hide ${isNarrativeOverlayVisible ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                        className={`relative z-10 p-4 max-h-[80%] scrollbar-hide ${isNarrativeOverlayVisible ? 'overflow-y-auto pointer-events-auto' : 'overflow-hidden pointer-events-none'}`}
                     >
                         <NarrativeLog entries={logs} isLoading={isProcessing} compact />
                     </div>
