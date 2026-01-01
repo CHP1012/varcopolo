@@ -31,7 +31,7 @@ interface ExplorationViewProps {
 // const ENABLE_AUTO_SFX = false;
 
 export default function ExplorationView({ world: initialWorld, player: initialPlayer, initialLogs = [], onExit }: ExplorationViewProps) {
-    const { addLog, updatePlayer, addCharacter, logs: storedLogs, currentWorld, appearanceTags, activeChoices, activeSceneImage, setActiveUI, settings, voiceMap, addNPCMemory, advanceGameTime, worldTime } = useSessionStore();
+    const { addLog, updatePlayer, addCharacter, logs: storedLogs, currentWorld, appearanceTags, activeChoices, activeSceneImage, setActiveUI, settings, voiceMap, addNPCMemory, advanceGameTime, worldTime, relationships, updateRelationship, addEvent, processEventQueue } = useSessionStore();
     const logs = storedLogs.length > 0 ? storedLogs : initialLogs;
 
     // ★ Initialize with persisted state if available
@@ -922,11 +922,11 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
 
         // Add time-of-day context for more realistic behavior
         const timeContext = `[현재 시간: Day ${worldTime.currentTime.day}, ${worldTime.currentTime.hour}:${String(worldTime.currentTime.minute).padStart(2, '0')} (${worldTime.currentTime.timeOfDay === 'dawn' ? '새벽 - 대부분 잠들어 있다' :
-                worldTime.currentTime.timeOfDay === 'morning' ? '아침 - 활동 시작' :
-                    worldTime.currentTime.timeOfDay === 'noon' ? '정오 - 가장 활발한 시간' :
-                        worldTime.currentTime.timeOfDay === 'afternoon' ? '오후 - 일상적 활동' :
-                            worldTime.currentTime.timeOfDay === 'evening' ? '저녁 - 귀가/휴식' :
-                                worldTime.currentTime.timeOfDay === 'night' ? '밤 - 위험하거나 조용함' : '한밤중 - 모두 잠듦'
+            worldTime.currentTime.timeOfDay === 'morning' ? '아침 - 활동 시작' :
+                worldTime.currentTime.timeOfDay === 'noon' ? '정오 - 가장 활발한 시간' :
+                    worldTime.currentTime.timeOfDay === 'afternoon' ? '오후 - 일상적 활동' :
+                        worldTime.currentTime.timeOfDay === 'evening' ? '저녁 - 귀가/휴식' :
+                            worldTime.currentTime.timeOfDay === 'night' ? '밤 - 위험하거나 조용함' : '한밤중 - 모두 잠듦'
             })]`;
 
         const context = inactivityContexts[level] ? `${timeContext} ${inactivityContexts[level]}` : "";
@@ -1011,10 +1011,18 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
 
         const timeTickInterval = setInterval(() => {
             advanceGameTime(1); // 1 real second = 1 game minute
+
+            // ★ Phase 5: Process event queue every tick
+            const readyEvents = processEventQueue();
+            if (readyEvents.length > 0) {
+                console.log(`[LivingWorld] 📋 Processing ${readyEvents.length} events:`, readyEvents.map(e => e.name));
+                // Events are processed - their actions would be handled here
+                // For now, just log and mark as consumed (done in processEventQueue)
+            }
         }, 1000);
 
         return () => clearInterval(timeTickInterval);
-    }, [showIntro, currentWorld, worldTime.isPaused, advanceGameTime]);
+    }, [showIntro, currentWorld, worldTime.isPaused, advanceGameTime, processEventQueue]);
 
     return (
         <div className="flex flex-col h-[100dvh] w-full max-w-4xl mx-auto bg-background md:border-x md:border-ui-bg font-sans relative overflow-hidden">
