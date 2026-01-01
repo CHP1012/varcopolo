@@ -920,7 +920,16 @@ export default function ExplorationView({ world: initialWorld, player: initialPl
             "(플레이어가 90초 이상 반응이 없습니다. NPC가 상황에 맞게 자율적으로 행동합니다. 떠나거나, 다른 행동을 하거나, 상황이 변화합니다.)"
         ];
 
-        const context = inactivityContexts[level] || "";
+        // Add time-of-day context for more realistic behavior
+        const timeContext = `[현재 시간: Day ${worldTime.currentTime.day}, ${worldTime.currentTime.hour}:${String(worldTime.currentTime.minute).padStart(2, '0')} (${worldTime.currentTime.timeOfDay === 'dawn' ? '새벽 - 대부분 잠들어 있다' :
+                worldTime.currentTime.timeOfDay === 'morning' ? '아침 - 활동 시작' :
+                    worldTime.currentTime.timeOfDay === 'noon' ? '정오 - 가장 활발한 시간' :
+                        worldTime.currentTime.timeOfDay === 'afternoon' ? '오후 - 일상적 활동' :
+                            worldTime.currentTime.timeOfDay === 'evening' ? '저녁 - 귀가/휴식' :
+                                worldTime.currentTime.timeOfDay === 'night' ? '밤 - 위험하거나 조용함' : '한밤중 - 모두 잠듦'
+            })]`;
+
+        const context = inactivityContexts[level] ? `${timeContext} ${inactivityContexts[level]}` : "";
         if (!context) return;
 
         console.log(`[LivingWorld] 🌍 Triggering autonomous NPC response (Level ${level})`);
