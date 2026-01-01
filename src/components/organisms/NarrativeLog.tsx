@@ -90,8 +90,9 @@ export default function NarrativeLog({ entries, isLoading = false, compact = fal
     }, []);
 
     // Auto-scroll ONLY when NEW entries are added AND user hasn't scrolled up
+    // ★ Disable auto-scroll in compact mode (overlay) to prevent jarring UX
     useEffect(() => {
-        if (!userScrolledUpRef.current) {
+        if (!userScrolledUpRef.current && !compact) {
             scrollToBottom();
         }
 
